@@ -1,0 +1,24 @@
+[package]
+name = 'vo-test'
+version = '0.1.0'
+authors = ['xie.jf <xie.jf@cidi.ai>']
+edition = '2018'
+
+[[bin]]
+name = 'vo-test'
+path = 'src/main.rs'
+
+[lib]
+name = 'vo'
+path = 'src/lib.rs'
+
+[dependencies]
+nalgebra = '^0.21'
+
+[dependencies.opencv]
+version = '0.36'
+default-features = false
+features = [
+    'opencv-32',
+    'contrib',
+]
