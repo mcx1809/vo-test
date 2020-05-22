@@ -20,7 +20,7 @@ impl ImagesReader {
         }
     }
 
-    pub async fn read_next_image(&mut self) -> Result<Mat> {
+    pub async fn read_next(&mut self) -> Result<Mat> {
         match File::open(self.dir.join(format!("{:06}.png", self.current_index))).await {
             Ok(mut file) => {
                 let mut buf = vec![];
@@ -29,7 +29,7 @@ impl ImagesReader {
                         match imdecode(&Vector::<u8>::from_iter(buf.into_iter()), IMREAD_GRAYSCALE)
                         {
                             Ok(img) => {
-                                self.current_index = self.current_index + 1;
+                                self.current_index += 1;
                                 Ok(img)
                             }
                             Err(_) => Err(Error::from(ErrorKind::InvalidData)),
@@ -54,7 +54,7 @@ mod test {
         let mut reader = ImagesReader::new("data/00/image_0");
 
         'a: loop {
-            match reader.read_next_image().await {
+            match reader.read_next().await {
                 Ok(img) => {
                     imshow("vo-test", &img).unwrap();
                     wait_key(20).unwrap();

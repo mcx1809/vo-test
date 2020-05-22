@@ -21,7 +21,7 @@ impl TimesReader {
         }
     }
 
-    pub async fn read_next_timestamp(&mut self) -> Result<SystemTime> {
+    pub async fn read_next(&mut self) -> Result<SystemTime> {
         let mut line = String::new();
         match self.reader.read_line(&mut line).await {
             Ok(_) => match line.trim().parse::<f64>() {
@@ -41,7 +41,7 @@ mod test {
     async fn test() {
         let mut reader = TimesReader::open("data/00/times.txt").await.unwrap();
         'a: loop {
-            match reader.read_next_timestamp().await {
+            match reader.read_next().await {
                 Ok(timestamp) => {
                     println!(
                         "{}",

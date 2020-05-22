@@ -12,8 +12,9 @@ edition = '2018'
 name = 'vo'
 path = 'src/lib.rs'
 
-[dependencies]
-nalgebra = '^0.21'
+[dependencies.nalgebra]
+version = '^0.21'
+default-features = false
 
 [dependencies.async-std]
 version = '^1.5'

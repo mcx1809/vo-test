@@ -46,7 +46,7 @@ impl Matcher {
                         // TODO:
                         mf.match_degree = 1.0;
 
-                        mf.prev_index = m.query_idx as usize;
+                        mf.prev_index = m.query_idx as u32;
                     }
 
                     matched_features
@@ -60,12 +60,12 @@ impl Matcher {
             self.prev_computed = Some(features.descriptors);
 
             {
-                let mut matched_features = Vec::<MatchedFeature>::new();
+                let mut matched_features =
+                    vec![MatchedFeature::default(); features.keypoints.len()];
 
-                matched_features.resize(features.keypoints.len(), MatchedFeature::default());
-                for i in 0..matched_features.len() {
-                    let kp = &features.keypoints.get(i).unwrap();
-                    let mf = &mut matched_features[i];
+                for i in matched_features.iter_mut().zip(features.keypoints.iter()) {
+                    let kp = i.1;
+                    let mf = i.0;
 
                     mf.position = Vector2::new(
                         (kp.pt.x as f64) - (features.img_cols as f64) / 2.0,
@@ -81,17 +81,17 @@ impl Matcher {
 
 #[derive(Clone)]
 pub struct MatchedFeature {
+    pub prev_index: u32,
     pub position: Vector2<f64>,
     pub match_degree: f64,
-    pub prev_index: usize,
 }
 
 impl MatchedFeature {
     fn default() -> Self {
         Self {
+            prev_index: 0,
             position: Vector2::new(0.0, 0.0),
             match_degree: 0.0,
-            prev_index: 0,
         }
     }
 }

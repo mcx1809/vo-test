@@ -14,17 +14,32 @@ pub use utils::*;
 
 #[cfg(test)]
 mod test {
-    use std::fs::File;
-    use std::io::{BufRead, BufReader};
-    use std::path::Path;
-
-    use opencv::{core::*, features2d::*, highgui::*, imgcodecs::*, imgproc::*};
-
     use super::*;
 
-    #[test]
-    fn test() {
+    #[async_std::test]
+    async fn test() {
+        let mut times_reader = TimesReader::open("data/00/times.txt").await.unwrap();
+        let mut images_reader = ImagesReader::new("data/00/image_0");
         let mut feature_extractor = FeatureExtractor::new();
         let mut matcher = Matcher::new();
+
+        'a: loop {
+            match times_reader.read_next().await {
+                Ok(time) => match images_reader.read_next().await {
+                    Ok(img) => {
+                        let matched_features = matcher
+                            .process(feature_extractor.get_features(&img).await)
+                            .await;
+                        println!("{}", matched_features.len());
+                    }
+                    Err(_) => {
+                        break 'a;
+                    }
+                },
+                Err(_) => {
+                    break 'a;
+                }
+            }
+        }
     }
 }
