@@ -8,6 +8,13 @@ pub struct Matcher {
     prev_computed: Option<Mat>,
 }
 
+#[derive(Clone)]
+pub struct MatchedFeature {
+    pub prev_index: u32,
+    pub position: Vector2<f64>,
+    pub match_degree: f64,
+}
+
 impl Matcher {
     pub fn new() -> Self {
         Self {
@@ -77,13 +84,6 @@ impl Matcher {
             }
         }
     }
-}
-
-#[derive(Clone)]
-pub struct MatchedFeature {
-    pub prev_index: u32,
-    pub position: Vector2<f64>,
-    pub match_degree: f64,
 }
 
 impl MatchedFeature {
