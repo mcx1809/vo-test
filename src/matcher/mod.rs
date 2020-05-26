@@ -34,7 +34,7 @@ impl Matcher {
                         &mut matches,
                         &no_array().unwrap(),
                     )
-                    .unwrap();
+                    .unwrap_or_default();
 
                 {
                     let mut matched_features = Vec::<MatchedFeature>::new();

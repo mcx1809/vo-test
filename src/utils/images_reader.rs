@@ -21,7 +21,10 @@ impl ImagesReader {
     }
 
     pub async fn read_next(&mut self) -> Result<Mat> {
-        match File::open(self.dir.join(format!("{:06}.png", self.current_index))).await {
+        let file_name = format!("{:06}.png", self.current_index);
+        println!("{}", file_name);
+
+        match File::open(self.dir.join(file_name)).await {
             Ok(mut file) => {
                 let mut buf = vec![];
                 match file.read_to_end(&mut buf).await {
