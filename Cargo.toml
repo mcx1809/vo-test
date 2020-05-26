@@ -18,7 +18,10 @@ default-features = false
 
 [dependencies.async-std]
 version = '^1.5'
-features = ['attributes']
+features = [
+    'attributes',
+    'unstable',
+]
 
 [dependencies.opencv]
 version = '0.36'

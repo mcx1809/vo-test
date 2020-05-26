@@ -131,7 +131,8 @@ fn draw_features_2d(src: &Mat) -> Mat {
     out
 }
 
-fn main() {
+#[async_std::main]
+async fn main() {
     let dataset_dir = Path::new("data").join("00");
 
     let times_file_path = dataset_dir.join("times.txt");
