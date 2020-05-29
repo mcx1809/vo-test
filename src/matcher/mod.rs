@@ -27,14 +27,16 @@ impl Matcher {
         if let Some(query_descriptors) = self.prev_computed.take() {
             let matched_features = {
                 let mut matches = opencv::core::Vector::<DMatch>::new();
-                self.matcher
-                    .train_match(
-                        &query_descriptors,
-                        &features.descriptors,
-                        &mut matches,
-                        &no_array().unwrap(),
-                    )
-                    .unwrap_or_default();
+                if query_descriptors.cols() == features.descriptors.cols() {
+                    self.matcher
+                        .train_match(
+                            &query_descriptors,
+                            &features.descriptors,
+                            &mut matches,
+                            &no_array().unwrap(),
+                        )
+                        .unwrap_or_default();
+                }
 
                 {
                     let mut matched_features = Vec::<MatchedFeature>::new();
