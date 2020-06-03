@@ -59,9 +59,9 @@ impl Matcher {
                         let query_kp_vp = get_vp(query_kp.pt.x, query_kp.pt.y);
                         let train_kp_vp = get_vp(train_kp.pt.x, train_kp.pt.y);
                         // TODO:
-                        const DISTANCE2_THRESHOLD: f64 = 50.0 * 50.0;
+                        const DISTANCE_THRESHOLD: f64 = 75.0;
                         let v = query_kp_vp - train_kp_vp;
-                        if v.dot(&v) <= DISTANCE2_THRESHOLD {
+                        if v.dot(&v) <= DISTANCE_THRESHOLD.powi(2) {
                             matches.push(m);
                             matched_trains.insert(m.train_idx, matches.len() - 1);
                         }

@@ -22,7 +22,7 @@ mod test {
         let mut images_reader = ImagesReader::new("data/00/image_0");
         let mut feature_extractor = FeatureExtractor::new();
         let mut matcher = Matcher::new();
-        let mut tracker = Tracker::new(4);
+        let mut tracker = Tracker::new(8);
         let tracked_viewer = TrackedViewer::new();
 
         'a: loop {
