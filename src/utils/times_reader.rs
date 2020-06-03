@@ -44,7 +44,7 @@ mod test {
             match reader.read_next().await {
                 Ok(timestamp) => {
                     println!(
-                        "{}",
+                        "timestamp: {}",
                         timestamp
                             .duration_since(SystemTime::UNIX_EPOCH)
                             .unwrap()

@@ -1,4 +1,3 @@
-use async_std::prelude::*;
 use async_std::sync::{channel, Receiver, Sender};
 use async_std::task::spawn;
 use nalgebra::*;
@@ -60,10 +59,15 @@ impl TrackedViewer {
         };
 
         for i in 0..tracked.points_count() {
+            //
+            println!("point {}", i);
             let mut prev: Option<TrackedPoint> = None;
             'a: for j in 0..tracked.frames_count() {
                 if let Some(cur_point) = tracked.get_point(j, i) {
                     if let Some(prev_point) = prev.take() {
+                        //
+                        let vp = translate_vp(&cur_point.vp_position);
+                        println!("-------------- {} {}", vp.x, vp.y);
                         line(
                             &mut dst,
                             translate_vp(&prev_point.vp_position),
@@ -75,6 +79,9 @@ impl TrackedViewer {
                         )
                         .unwrap();
                     } else {
+                        //
+                        let vp = translate_vp(&cur_point.vp_position);
+                        println!("-------------- {} {}", vp.x, vp.y);
                         circle(
                             &mut dst,
                             translate_vp(&cur_point.vp_position),

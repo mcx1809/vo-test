@@ -44,35 +44,27 @@ impl Tracker {
     }
 
     pub fn update_matched(&mut self, timestamp: &SystemTime, features: &[MatchedFeature]) {
-        let points = {
-            let mut points = Vec::with_capacity(features.len());
-
-            for m in features {
-                points.push(FramePoint {
-                    prev_index: m.prev_index,
-                    vp_position: m.position,
-                    match_degree: m.match_degree,
-                });
-            }
-
-            points
-        };
+        let points = features
+            .iter()
+            .map(|m| FramePoint {
+                prev_index: m.prev_index,
+                vp_position: m.position,
+                match_degree: m.match_degree,
+            })
+            .collect();
 
         let frame = Frame {
             timestamp: *timestamp,
             points,
         };
 
-        self.frames.push_front(frame);
-        if self.frames.len() > self.max_frames_buffered as usize {
+        if self.frames.len() == self.max_frames_buffered as usize {
             self.frames.pop_back();
         }
+        self.frames.push_front(frame);
     }
 
     pub fn get_tracked(&self) -> Tracked {
-        let mut prev_indexes = Vec::new();
-        let mut tracked = Tracked { frames: Vec::new() };
-
         let has_tracked = |indexes: &[u32]| {
             indexes.iter().fold(
                 false,
@@ -88,50 +80,52 @@ impl Tracker {
             }
         };
 
+        let mut prev_indexes = Vec::new();
+        let mut tracked = Tracked { frames: Vec::new() };
         let mut first_frame = true;
         'a: for matched_frame in &self.frames {
-            if first_frame {
+            let tracked_frame_points = if first_frame {
                 first_frame = false;
 
-                let mut tracked_frame = TrackedFrame {
-                    timestamp: matched_frame.timestamp,
-                    points: Vec::new(),
-                };
-
                 prev_indexes.reserve(matched_frame.points.len());
-                tracked_frame.points.reserve(matched_frame.points.len());
-                for matched_point in &matched_frame.points {
-                    prev_indexes.push(get_index(matched_point));
+                let tracked_frame_points = matched_frame
+                    .points
+                    .iter()
+                    .map(|matched_point| {
+                        prev_indexes.push(get_index(matched_point));
 
-                    tracked_frame.points.push(TrackedPoint {
-                        vp_position: matched_point.vp_position,
-                    });
-                }
+                        TrackedPoint {
+                            vp_position: matched_point.vp_position,
+                        }
+                    })
+                    .collect();
 
-                tracked.frames.push(tracked_frame);
-                if !has_tracked(&prev_indexes) {
-                    break 'a;
-                }
+                tracked_frame_points
             } else {
-                let mut tracked_frame = TrackedFrame {
-                    timestamp: matched_frame.timestamp,
-                    points: vec![TrackedPoint::default(); prev_indexes.len()],
-                };
-
+                let mut tracked_frame_points = vec![TrackedPoint::default(); prev_indexes.len()];
                 for (prev_index, tracked_point) in
-                    prev_indexes.iter_mut().zip(tracked_frame.points.iter_mut())
+                    prev_indexes.iter_mut().zip(tracked_frame_points.iter_mut())
                 {
                     if let Some(matched_point) = matched_frame.points.get(*prev_index as usize) {
                         *prev_index = get_index(matched_point);
 
                         tracked_point.vp_position = matched_point.vp_position;
+                    } else {
+                        tracked_point.vp_position.x = f64::NAN;
+                        tracked_point.vp_position.y = f64::NAN;
                     }
                 }
 
-                tracked.frames.push(tracked_frame);
-                if !has_tracked(&prev_indexes) {
-                    break 'a;
-                }
+                tracked_frame_points
+            };
+
+            tracked.frames.push(TrackedFrame {
+                timestamp: matched_frame.timestamp,
+                points: tracked_frame_points,
+            });
+
+            if !has_tracked(&prev_indexes) {
+                break 'a;
             }
         }
 
@@ -163,7 +157,9 @@ impl Tracked {
     pub fn get_point(&self, frame_index: u32, point_index: u32) -> Option<TrackedPoint> {
         if let Some(frame) = self.frames.get(frame_index as usize) {
             if let Some(point) = frame.points.get(point_index as usize) {
-                return Some(*point);
+                if !point.vp_position.x.is_nan() {
+                    return Some(*point);
+                }
             }
         }
 
