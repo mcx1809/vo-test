@@ -74,7 +74,12 @@ impl TrackedViewer {
                             &mut dst,
                             translate_vp(&prev_point.vp_position),
                             translate_vp(&cur_point.vp_position),
-                            opencv::core::Scalar::new(0.0, 256.0 * color_ratio, 0.0, 0.0),
+                            opencv::core::Scalar::new(
+                                0.0,
+                                256.0 * (1.0 - color_ratio),
+                                256.0 * color_ratio,
+                                0.0,
+                            ),
                             1,
                             LINE_AA,
                             0,
