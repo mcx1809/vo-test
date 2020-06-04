@@ -65,6 +65,13 @@ impl TrackedViewer {
             let mut prev: Option<TrackedPoint> = None;
             let mut color_ratio = 1.0;
             'a: for j in 0..tracked.frames_count() {
+                let color = opencv::core::Scalar::new(
+                    256.0 * (1.0 - color_ratio),
+                    256.0 * color_ratio,
+                    0.0,
+                    0.0,
+                );
+
                 if let Some(cur_point) = tracked.get_point(j, i) {
                     if let Some(prev_point) = prev.take() {
                         //
@@ -74,12 +81,7 @@ impl TrackedViewer {
                             &mut dst,
                             translate_vp(&prev_point.vp_position),
                             translate_vp(&cur_point.vp_position),
-                            opencv::core::Scalar::new(
-                                0.0,
-                                256.0 * (1.0 - color_ratio),
-                                256.0 * color_ratio,
-                                0.0,
-                            ),
+                            color,
                             1,
                             LINE_AA,
                             0,
@@ -93,7 +95,7 @@ impl TrackedViewer {
                             &mut dst,
                             translate_vp(&cur_point.vp_position),
                             5,
-                            opencv::core::Scalar::new(0.0, 256.0 * color_ratio, 0.0, 0.0),
+                            color,
                             1,
                             LINE_AA,
                             0,
