@@ -61,7 +61,7 @@ impl TrackedViewer {
 
         for i in 0..tracked.points_count() {
             //
-            println!("point {}", i);
+            //println!("point {}", i);
             let mut prev: Option<TrackedPoint> = None;
             let mut color_ratio = 1.0;
             'a: for j in 0..tracked.frames_count() {

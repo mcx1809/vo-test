@@ -36,11 +36,11 @@ mod test {
                         tracker.update_matched(&time, &matched_features);
                         let tracked = tracker.get_tracked();
 
-                        /*println!(
+                        println!(
                             "points {} frames {}",
                             tracked.points_count(),
                             tracked.frames_count()
-                        );*/
+                        );
 
                         tracked_viewer
                             .show_tracked(&img, &tracked, Some(20))
