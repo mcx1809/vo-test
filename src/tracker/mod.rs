@@ -12,10 +12,10 @@ pub struct Tracker {
 
 struct Frame {
     timestamp: SystemTime,
-    points: Vec<FramePoint>,
+    points: Vec<Point>,
 }
 
-struct FramePoint {
+struct Point {
     prev_index: u32,
     vp_position: Vector2<f64>,
     match_degree: f64,
@@ -43,13 +43,13 @@ impl Tracker {
         }
     }
 
-    pub fn update_matched(&mut self, timestamp: &SystemTime, features: &[MatchedFeature]) {
-        let points = features
+    pub fn update_matched(&mut self, timestamp: &SystemTime, matched_features: &[MatchedFeature]) {
+        let points = matched_features
             .iter()
-            .map(|m| FramePoint {
-                prev_index: m.prev_index,
-                vp_position: m.position,
-                match_degree: m.match_degree,
+            .map(|mp| Point {
+                prev_index: mp.prev_index,
+                vp_position: mp.position,
+                match_degree: mp.match_degree,
             })
             .collect();
 
@@ -65,16 +65,9 @@ impl Tracker {
     }
 
     pub fn get_tracked(&self) -> Tracked {
-        let has_tracked = |indexes: &[u32]| {
-            indexes.iter().fold(
-                false,
-                |_, index| if *index != u32::MAX { true } else { false },
-            )
-        };
-
-        let get_index = |matched_point: &FramePoint| {
-            if matched_point.match_degree > 0.0 {
-                matched_point.prev_index
+        let get_index = |p: &Point| {
+            if p.match_degree > 0.0 {
+                p.prev_index
             } else {
                 u32::MAX
             }
@@ -84,47 +77,39 @@ impl Tracker {
         let mut tracked = Tracked { frames: Vec::new() };
         let mut first_frame = true;
         'a: for matched_frame in &self.frames {
-            let tracked_frame_points = if first_frame {
+            let tracked_points = if first_frame {
                 first_frame = false;
 
-                prev_indexes.reserve(matched_frame.points.len());
-                let tracked_frame_points = matched_frame
+                prev_indexes = matched_frame.points.iter().map(|p| get_index(p)).collect();
+
+                matched_frame
                     .points
                     .iter()
-                    .map(|matched_point| {
-                        prev_indexes.push(get_index(matched_point));
-
-                        TrackedPoint {
-                            vp_position: matched_point.vp_position,
-                        }
+                    .map(|p| TrackedPoint {
+                        vp_position: p.vp_position,
                     })
-                    .collect();
-
-                tracked_frame_points
+                    .collect()
             } else {
-                let mut tracked_frame_points = vec![TrackedPoint::default(); prev_indexes.len()];
-                for (prev_index, tracked_point) in
-                    prev_indexes.iter_mut().zip(tracked_frame_points.iter_mut())
-                {
-                    if let Some(matched_point) = matched_frame.points.get(*prev_index as usize) {
-                        *prev_index = get_index(matched_point);
-
-                        tracked_point.vp_position = matched_point.vp_position;
-                    } else {
-                        tracked_point.vp_position.x = f64::NAN;
-                        tracked_point.vp_position.y = f64::NAN;
+                let mut tracked_points = vec![TrackedPoint::default(); prev_indexes.len()];
+                for (prev_index, tp) in prev_indexes.iter_mut().zip(tracked_points.iter_mut()) {
+                    if let Some(p) = matched_frame.points.get(*prev_index as usize) {
+                        *prev_index = get_index(p);
+                        tp.vp_position = p.vp_position;
                     }
                 }
 
-                tracked_frame_points
+                tracked_points
             };
 
             tracked.frames.push(TrackedFrame {
                 timestamp: matched_frame.timestamp,
-                points: tracked_frame_points,
+                points: tracked_points,
             });
 
-            if !has_tracked(&prev_indexes) {
+            if !prev_indexes.iter().fold(
+                false,
+                |flag, index| if *index != u32::MAX { true } else { flag },
+            ) {
                 break 'a;
             }
         }
@@ -170,7 +155,7 @@ impl Tracked {
 impl TrackedPoint {
     fn default() -> Self {
         Self {
-            vp_position: Vector2::<f64>::new(0.0, 0.0),
+            vp_position: Vector2::<f64>::new(f64::NAN, f64::NAN),
         }
     }
 }

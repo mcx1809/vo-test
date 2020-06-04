@@ -26,7 +26,7 @@ impl TimesReader {
         match self.reader.read_line(&mut line).await {
             Ok(_) => match line.trim().parse::<f64>() {
                 Ok(time) => Ok(SystemTime::UNIX_EPOCH + Duration::from_secs_f64(time)),
-                Err(err) => Err(Error::from(ErrorKind::InvalidData)),
+                Err(_) => Err(Error::from(ErrorKind::InvalidData)),
             },
             Err(err) => Err(err),
         }
