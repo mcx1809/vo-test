@@ -22,7 +22,7 @@ mod test {
         let mut images_reader = ImagesReader::new("data/00/image_0");
         let mut feature_extractor = FeatureExtractor::new();
         let mut matcher = Matcher::new();
-        let mut tracker = Tracker::new(8);
+        let mut tracker = Tracker::new(16);
         let tracked_viewer = TrackedViewer::new();
 
         'a: loop {
@@ -36,14 +36,14 @@ mod test {
                         tracker.update_matched(&time, &matched_features);
                         let tracked = tracker.get_tracked();
 
-                        println!(
+                        /*println!(
                             "points {} frames {}",
                             tracked.points_count(),
                             tracked.frames_count()
-                        );
+                        );*/
 
                         tracked_viewer
-                            .show_tracked(&img, &tracked, Some(0))
+                            .show_tracked(&img, &tracked, Some(20))
                             .await
                             .unwrap();
                     }

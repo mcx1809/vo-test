@@ -50,7 +50,8 @@ impl TrackedViewer {
         tracked: &Tracked,
         wait_key_delay: Option<i32>,
     ) -> Result<()> {
-        let mut dst = src.clone().unwrap();
+        let mut dst = Mat::default().unwrap();
+        cvt_color(&src, &mut dst, COLOR_GRAY2RGBA, 0).unwrap();
 
         let img_xo = dst.cols() / 2;
         let img_yo = dst.rows() / 2;
@@ -62,17 +63,18 @@ impl TrackedViewer {
             //
             println!("point {}", i);
             let mut prev: Option<TrackedPoint> = None;
+            let mut color_ratio = 1.0;
             'a: for j in 0..tracked.frames_count() {
                 if let Some(cur_point) = tracked.get_point(j, i) {
                     if let Some(prev_point) = prev.take() {
                         //
-                        let vp = translate_vp(&cur_point.vp_position);
-                        println!("-------------- {} {}", vp.x, vp.y);
+                        //let vp = translate_vp(&cur_point.vp_position);
+                        //println!("-------------- {} {}", vp.x, vp.y);
                         line(
                             &mut dst,
                             translate_vp(&prev_point.vp_position),
                             translate_vp(&cur_point.vp_position),
-                            opencv::core::Scalar::all(256.0),
+                            opencv::core::Scalar::new(0.0, 256.0 * color_ratio, 0.0, 0.0),
                             1,
                             LINE_AA,
                             0,
@@ -80,21 +82,23 @@ impl TrackedViewer {
                         .unwrap();
                     } else {
                         //
-                        let vp = translate_vp(&cur_point.vp_position);
-                        println!("-------------- {} {}", vp.x, vp.y);
-                        circle(
+                        //let vp = translate_vp(&cur_point.vp_position);
+                        //println!("-------------- {} {}", vp.x, vp.y);
+                        /*circle(
                             &mut dst,
                             translate_vp(&cur_point.vp_position),
-                            10,
-                            opencv::core::Scalar::all(256.0),
+                            5,
+                            opencv::core::Scalar::new(0.0, 256.0 * color_ratio, 0.0, 0.0),
                             1,
                             LINE_AA,
                             0,
                         )
-                        .unwrap();
+                        .unwrap();*/
                     }
 
                     prev = Some(cur_point);
+
+                    color_ratio *= 0.85;
                 } else {
                     break 'a;
                 }
