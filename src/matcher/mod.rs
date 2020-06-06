@@ -61,7 +61,7 @@ impl Matcher {
                     // 考虑匹配的两点距离
                     let query_kp_vp = get_vp(query_kp.pt.x, query_kp.pt.y);
                     let train_kp_vp = get_vp(train_kp.pt.x, train_kp.pt.y);
-                    const DISTANCE_THRESHOLD: f64 = 25.0;
+                    const DISTANCE_THRESHOLD: f64 = 75.0;
                     let v = query_kp_vp - train_kp_vp;
                     if v.dot(&v) <= DISTANCE_THRESHOLD.powi(2) {
                         let mf = &mut matched_features[m.train_idx as usize];

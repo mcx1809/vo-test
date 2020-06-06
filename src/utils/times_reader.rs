@@ -13,23 +13,19 @@ pub struct TimesReader {
 
 impl TimesReader {
     pub async fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
-        match File::open(path.as_ref()).await {
-            Ok(file) => Ok(Self {
-                reader: BufReader::new(file),
-            }),
-            Err(err) => Err(err),
-        }
+        File::open(path.as_ref()).await.map(|file| Self {
+            reader: BufReader::new(file),
+        })
     }
 
     pub async fn read_next(&mut self) -> Result<SystemTime> {
         let mut line = String::new();
-        match self.reader.read_line(&mut line).await {
-            Ok(_) => match line.trim().parse::<f64>() {
-                Ok(time) => Ok(SystemTime::UNIX_EPOCH + Duration::from_secs_f64(time)),
-                Err(_) => Err(Error::from(ErrorKind::InvalidData)),
-            },
-            Err(err) => Err(err),
-        }
+        self.reader.read_line(&mut line).await.and_then(|_| {
+            line.trim()
+                .parse::<f64>()
+                .map(|time| SystemTime::UNIX_EPOCH + Duration::from_secs_f64(time))
+                .map_err(|_| Error::from(ErrorKind::InvalidData))
+        })
     }
 }
 

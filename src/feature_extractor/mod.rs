@@ -7,7 +7,7 @@ pub struct FeatureExtractor {
 impl FeatureExtractor {
     pub fn new() -> Self {
         Self {
-            orb: ORB::create(500, 2.0, 8, 31, 0, 2, ORB_FAST_SCORE, 31, 125).unwrap(),
+            orb: ORB::create(500, 2.0, 8, 31, 0, 2, ORB_FAST_SCORE, 31, 100).unwrap(),
         }
     }
 

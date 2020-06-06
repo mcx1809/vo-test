@@ -17,7 +17,7 @@ impl TrackedViewer {
 
         spawn(async move {
             'a: loop {
-                if let Some((img, wait_key_delay)) = rx.recv().await {
+                if let Ok((img, wait_key_delay)) = rx.recv().await {
                     r_tx.send(
                         async move {
                             imshow("tracked-viewer", &img)
@@ -105,7 +105,7 @@ impl TrackedViewer {
 
                     prev = Some(cur_point);
 
-                    color_ratio *= 0.85;
+                    color_ratio *= 0.95;
                 } else {
                     break 'a;
                 }

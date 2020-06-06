@@ -20,6 +20,7 @@ impl ImagesReader {
         }
     }
 
+    // TODO: 并行优化
     pub async fn read_next(&mut self) -> Result<Mat> {
         let file_name = format!("{:06}.png", self.current_index);
         println!("{}", file_name);
