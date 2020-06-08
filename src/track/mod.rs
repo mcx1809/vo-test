@@ -43,7 +43,11 @@ impl Tracker {
         }
     }
 
-    pub fn update_matched(&mut self, timestamp: &SystemTime, matched_features: &[MatchedFeature]) {
+    pub fn update_matched(
+        &mut self,
+        timestamp: &SystemTime,
+        matched_features: &[feature::MatchedFeature],
+    ) {
         let points = matched_features
             .iter()
             .map(|mp| Point {

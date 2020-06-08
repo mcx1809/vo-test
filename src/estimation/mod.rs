@@ -1,16 +1,12 @@
 use nalgebra::*;
 
-use crate::*;
+mod estimator;
+mod slover;
 
-pub struct Estimator {}
+pub use estimator::*;
+pub use slover::*;
 
 pub struct Displacement {
     position_diff: Vector3<f64>,
     orientation_diff: Quaternion<f64>,
-}
-
-impl Estimator {
-    pub fn new() -> Self {
-        Self {}
-    }
 }

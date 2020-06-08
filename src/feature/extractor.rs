@@ -1,10 +1,10 @@
 use opencv::{core::*, features2d::*};
 
-pub struct FeatureExtractor {
+pub struct Extractor {
     orb: Ptr<dyn ORB>,
 }
 
-impl FeatureExtractor {
+impl Extractor {
     pub fn new() -> Self {
         Self {
             orb: ORB::create(500, 2.0, 8, 31, 0, 2, ORB_FAST_SCORE, 31, 100).unwrap(),

@@ -1,16 +1,9 @@
 pub use std::io::{Error, ErrorKind, Result};
 
-mod estimator;
-mod feature_extractor;
-mod matcher;
-mod tracker;
-mod utils;
-
-pub use estimator::*;
-pub use feature_extractor::*;
-pub use matcher::*;
-pub use tracker::*;
-pub use utils::*;
+pub mod estimation;
+pub mod feature;
+pub mod track;
+pub mod utils;
 
 #[cfg(test)]
 mod test {
@@ -18,12 +11,12 @@ mod test {
 
     #[async_std::test]
     async fn test() {
-        let mut times_reader = TimesReader::open("data/00/times.txt").await.unwrap();
-        let mut images_reader = ImagesReader::new("data/00/image_0");
-        let mut feature_extractor = FeatureExtractor::new();
-        let mut matcher = Matcher::new();
-        let mut tracker = Tracker::new(16);
-        let tracked_viewer = TrackedViewer::new();
+        let mut times_reader = utils::TimesReader::open("data/00/times.txt").await.unwrap();
+        let mut images_reader = utils::ImagesReader::new("data/00/image_0");
+        let mut feature_extractor = feature::Extractor::new();
+        let mut matcher = feature::Matcher::new();
+        let mut tracker = track::Tracker::new(16);
+        let tracked_viewer = utils::TrackedViewer::new();
 
         'a: loop {
             match times_reader.read_next().await {

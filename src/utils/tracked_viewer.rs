@@ -47,7 +47,7 @@ impl TrackedViewer {
     pub async fn show_tracked(
         &self,
         src: &Mat,
-        tracked: &Tracked,
+        tracked: &track::Tracked,
         wait_key_delay: Option<i32>,
     ) -> Result<()> {
         let mut dst = Mat::default().unwrap();
@@ -62,7 +62,7 @@ impl TrackedViewer {
         for i in 0..tracked.points_count() {
             //
             //println!("point {}", i);
-            let mut prev: Option<TrackedPoint> = None;
+            let mut prev: Option<track::TrackedPoint> = None;
             let mut color_ratio = 1.0;
             'a: for j in 0..tracked.frames_count() {
                 let color = opencv::core::Scalar::new(
