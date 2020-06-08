@@ -13,6 +13,7 @@ pub async fn read_camera_param<P: AsRef<Path>>(path: P) -> Result<Vec<Matrix3x4<
         Ok(file) => {
             let mut reader = BufReader::new(file);
 
+            // TODO: 读取行数不受限
             let mut params = Vec::new();
             'a: loop {
                 let mut line = String::new();
@@ -35,9 +36,7 @@ pub async fn read_camera_param<P: AsRef<Path>>(path: P) -> Result<Vec<Matrix3x4<
                                 };
 
                                 if i == 12 {
-                                    let mut m = Matrix3x4::zeros();
-                                    m.copy_from_slice(&vv);
-                                    params.push(m);
+                                    params.push(Matrix3x4::from_row_slice(&vv));
                                     Err(Error::from(ErrorKind::Other))
                                 } else {
                                     r
