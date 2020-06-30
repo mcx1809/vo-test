@@ -1,9 +1,22 @@
 pub use std::io::{Error, ErrorKind, Result};
 
+use std::time::{Duration, SystemTime};
+
 pub mod estimation;
 pub mod feature;
+pub mod source;
 pub mod track;
 pub mod utils;
+
+pub fn timestamp_to_seconds(time: &SystemTime) -> f64 {
+    time.duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs_f64()
+}
+
+pub fn seconds_to_timestamp(time: f64) -> SystemTime {
+    SystemTime::UNIX_EPOCH + Duration::from_secs_f64(time)
+}
 
 #[cfg(test)]
 mod test {

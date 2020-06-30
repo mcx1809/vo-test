@@ -1,5 +1,5 @@
 use std::path::*;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 
 use async_std::fs::File;
 use async_std::io::BufReader;
@@ -23,7 +23,7 @@ impl TimesReader {
         self.reader.read_line(&mut line).await.and_then(|_| {
             line.trim()
                 .parse::<f64>()
-                .map(|time| SystemTime::UNIX_EPOCH + Duration::from_secs_f64(time))
+                .map(|time| seconds_to_timestamp(time))
                 .map_err(|_| Error::from(ErrorKind::InvalidData))
         })
     }
@@ -39,13 +39,7 @@ mod test {
         'a: loop {
             match reader.read_next().await {
                 Ok(timestamp) => {
-                    println!(
-                        "timestamp: {}",
-                        timestamp
-                            .duration_since(SystemTime::UNIX_EPOCH)
-                            .unwrap()
-                            .as_secs_f64()
-                    );
+                    println!("timestamp: {}", timestamp_to_seconds(&timestamp));
                 }
                 Err(err) => {
                     println!("{}", err);

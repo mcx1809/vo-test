@@ -7,7 +7,7 @@ pub struct Extractor {
 impl Extractor {
     pub fn new() -> Self {
         Self {
-            orb: ORB::create(500, 2.0, 8, 31, 0, 2, ORB_FAST_SCORE, 31, 100).unwrap(),
+            orb: ORB::create(500, 2.0, 8, 31, 0, 2, ORB_ScoreType::FAST_SCORE, 31, 100).unwrap(),
         }
     }
 
@@ -61,9 +61,17 @@ mod test {
             0.000000000000e+00,
         );
 
-        let x = Vector4::new(0.0, 0.0, 10.0, 1.0);
+        let ppi = SVD::new(p, true, true).pseudo_inverse(1e-6).unwrap();
+        println!("{} {} {} {}", p, ppi, p * ppi, ppi * p);
+
+        let x = Vector4::new(30.0, 10.0, 11.0, 1.0);
         let y = p * x;
 
         println!("{} {}", y[0] / y[2], y[1] / y[2]);
+        println!("{} {} {}", y[0], y[1], y[2]);
+
+        println!("{}", ppi * y);
+        let y1 = Vector3::<f64>::new(y[0] / y[2], y[1] / y[2], 1.0);
+        println!("{}", ppi * y1);
     }
 }
