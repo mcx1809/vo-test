@@ -15,6 +15,7 @@ use imu::*;
 pub struct Source {
     imu_data: ImuData,
     images_reader: ImagesReader,
+    camera_param: Matrix3x4<f64>,
 }
 
 pub struct SourceFrame {
@@ -31,10 +32,13 @@ impl Source {
     pub async fn new<P: AsRef<Path>>(dir: P) -> Result<Self> {
         match ImuData::load(dir.as_ref(), &Vector3::zeros(), &Vector3::zeros()).await {
             Ok(imu_data) => match ImagesReader::open(dir).await {
-                Ok(images_reader) => Ok(Self {
+                Ok(images_reader) =>{ 
+                    match utils::read_camera_param(dir.as_ref().join(path))
+                    
+                    Ok(Self {
                     imu_data,
                     images_reader,
-                }),
+                })}
                 Err(err) => Err(err),
             },
             Err(err) => Err(err),
