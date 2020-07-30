@@ -20,19 +20,24 @@ pub fn seconds_to_timestamp(time: f64) -> SystemTime {
 
 #[cfg(test)]
 mod test {
+    use std::path::*;
+
     use nalgebra::*;
 
     use super::*;
 
     #[async_std::test]
     async fn test() {
-        let mut times_reader = utils::TimesReader::open("data/00/times.txt").await.unwrap();
-        let mut images_reader = utils::ImagesReader::new("data/00/image_0");
+        let dir = Path::new("data/00");
+        let mut times_reader = utils::TimesReader::open(dir.join("times.txt"))
+            .await
+            .unwrap();
+        let mut images_reader = utils::ImagesReader::new(dir.join("image_0"));
         let mut feature_extractor = feature::Extractor::new();
         let mut matcher = feature::Matcher::new();
         let mut tracker = track::Tracker::new(16);
         let tracked_viewer = utils::TrackedViewer::new();
-        let camera_param = utils::read_camera_param("data/00/calib.txt")
+        let camera_param = utils::read_camera_param(dir.join("calib.txt"))
             .await
             .unwrap()
             .get(0)
