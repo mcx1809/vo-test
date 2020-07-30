@@ -53,11 +53,7 @@ impl TrackedViewer {
         let mut dst = Mat::default().unwrap();
         cvt_color(&src, &mut dst, COLOR_GRAY2RGBA, 0).unwrap();
 
-        let img_xo = dst.cols() / 2;
-        let img_yo = dst.rows() / 2;
-        let translate_vp = |vp: &Vector2<f64>| {
-            opencv::core::Point::new(vp.x as i32 + img_xo, -(vp.y as i32) + img_yo)
-        };
+        let translate_vp = |vp: &Vector2<f64>| opencv::core::Point::new(vp.x as i32, vp.y as i32);
 
         for i in 0..tracked.points_count() {
             //

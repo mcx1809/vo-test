@@ -20,6 +20,8 @@ pub fn seconds_to_timestamp(time: f64) -> SystemTime {
 
 #[cfg(test)]
 mod test {
+    use nalgebra::*;
+
     use super::*;
 
     #[async_std::test]
@@ -30,6 +32,15 @@ mod test {
         let mut matcher = feature::Matcher::new();
         let mut tracker = track::Tracker::new(16);
         let tracked_viewer = utils::TrackedViewer::new();
+        let camera_param = utils::read_camera_param("data/00/calib.txt")
+            .await
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .clone();
+        // TODO：
+        let camera_matrix = Matrix3::from(camera_param.fixed_columns::<U3>(0));
+        let estimator = estimation::Estimator::new(camera_matrix);
 
         'a: loop {
             match times_reader.read_next().await {
@@ -42,16 +53,29 @@ mod test {
                         tracker.update_matched(&time, &matched_features);
                         let tracked = tracker.get_tracked();
 
-                        println!(
-                            "points {} frames {}",
-                            tracked.points_count(),
-                            tracked.frames_count()
-                        );
+                        // println!(
+                        //     "points {} frames {}",
+                        //     tracked.points_count(),
+                        //     tracked.frames_count()
+                        // );
 
                         tracked_viewer
                             .show_tracked(&img, &tracked, Some(20))
                             .await
                             .unwrap();
+
+                        match estimator.test_slove_displacement(&tracked) {
+                            Ok(d) => {
+                                let o = UnitQuaternion::from_quaternion(d.orientation_diff)
+                                    .euler_angles();
+                                println!("R: {} {} {}", o.0, o.1, o.2);
+                                println!(
+                                    "t: {} {} {}",
+                                    d.position_diff[0], d.position_diff[1], d.position_diff[2]
+                                );
+                            }
+                            Err(_) => println!("Slove failed."),
+                        }
                     }
                     Err(_) => {
                         break 'a;

@@ -3,9 +3,9 @@ name = 'vo-test'
 path = 'src/main.rs'
 
 [package]
-authors = [ 'xie.jf <xie.jf@cidi.ai>' ]
+authors = ['xie.jf <xie.jf@cidi.ai>']
 edition = '2018'
-name    = 'vo-test'
+name = 'vo-test'
 version = '0.1.0'
 
 [lib]
@@ -13,18 +13,18 @@ name = 'vo'
 path = 'src/lib.rs'
 
 [dependencies]
-rand       = '^0.7'
+rand = '^0.7'
 rand_distr = '^0.2'
 
 [dependencies.nalgebra]
 default-features = false
-version          = '^0.21'
+version = '^0.21'
 
 [dependencies.async-std]
-features = [ 'attributes', 'unstable' ]
-version  = '^1.6'
+features = ['attributes', 'unstable']
+version = '^1.6'
 
 [dependencies.opencv]
 default-features = false
-features         = [ 'opencv-4', 'contrib' ]
-version          = '^0.41'
+features = ['opencv-4', 'contrib', 'buildtime-bindgen']
+version = '^0.43'

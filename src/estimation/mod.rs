@@ -7,6 +7,6 @@ pub use estimator::*;
 pub use slover::*;
 
 pub struct Displacement {
-    position_diff: Vector3<f64>,
-    orientation_diff: Quaternion<f64>,
+    pub position_diff: Vector3<f64>,
+    pub orientation_diff: Quaternion<f64>,
 }

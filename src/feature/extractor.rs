@@ -25,8 +25,6 @@ impl Extractor {
             .unwrap();
 
         Features {
-            img_rows: src.rows(),
-            img_cols: src.cols(),
             keypoints,
             descriptors,
         }
@@ -34,8 +32,6 @@ impl Extractor {
 }
 
 pub struct Features {
-    pub img_rows: i32,
-    pub img_cols: i32,
     pub keypoints: Vector<KeyPoint>,
     pub descriptors: Mat,
 }
@@ -61,17 +57,17 @@ mod test {
             0.000000000000e+00,
         );
 
-        let ppi = SVD::new(p, true, true).pseudo_inverse(1e-6).unwrap();
-        println!("{} {} {} {}", p, ppi, p * ppi, ppi * p);
+        //let ppi = SVD::new(p, true, true).pseudo_inverse(1e-6).unwrap();
+        //println!("{} {} {} {}", p, ppi, p * ppi, ppi * p);
 
-        let x = Vector4::new(30.0, 10.0, 11.0, 1.0);
+        let x = Vector4::new(-2.0, 0.0, 15.0, 1.0);
         let y = p * x;
 
         println!("{} {}", y[0] / y[2], y[1] / y[2]);
-        println!("{} {} {}", y[0], y[1], y[2]);
+        //println!("{} {} {}", y[0], y[1], y[2]);
 
-        println!("{}", ppi * y);
-        let y1 = Vector3::<f64>::new(y[0] / y[2], y[1] / y[2], 1.0);
-        println!("{}", ppi * y1);
+        //println!("{}", ppi * y);
+        //let y1 = Vector3::<f64>::new(y[0] / y[2], y[1] / y[2], 1.0);
+        //println!("{}", ppi * y1);
     }
 }

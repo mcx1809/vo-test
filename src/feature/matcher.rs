@@ -26,11 +26,9 @@ impl Matcher {
     pub async fn process(&mut self, features: Features) -> Vec<MatchedFeature> {
         let train_descriptors = features.descriptors;
         let train_keypoints = features.keypoints;
-        let img_xo = (features.img_cols as f64) / 2.0;
-        let img_yo = (features.img_rows as f64) / 2.0;
 
         let matched_features = {
-            let get_vp = |x, y| Vector2::new(x as f64 - img_xo, -(y as f64 - img_yo));
+            let get_vp = |x, y| Vector2::new(x as f64, y as f64);
 
             let mut matched_features = train_keypoints
                 .iter()
