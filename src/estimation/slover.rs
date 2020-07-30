@@ -4,11 +4,11 @@ use opencv::{calib3d::*, core::*, types::*};
 use super::*;
 use crate::*;
 
-pub fn slove_displacement(
+pub fn slove_transform(
     camera_matrix: &Matrix3<f64>,
     points_0: &[Vector2<f64>],
     points_1: &[Vector2<f64>],
-) -> Result<Displacement> {
+) -> Result<Transform> {
     if points_0.len() == points_1.len() {
         if points_0.len() >= 5 {
             let trans_points = |points: &[Vector2<f64>]| {
@@ -58,7 +58,7 @@ pub fn slove_displacement(
                     &mut t,
                     &mut no_array().unwrap(),
                 )
-                .map(|_| Displacement {
+                .map(|_| Transform {
                     position_diff: Vector3::new(
                         *t.at(0).unwrap(),
                         *t.at(1).unwrap(),

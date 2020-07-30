@@ -2,11 +2,23 @@ pub use std::io::{Error, ErrorKind, Result};
 
 use std::time::{Duration, SystemTime};
 
+use nalgebra::*;
+
 pub mod estimation;
 pub mod feature;
 pub mod source;
 pub mod track;
 pub mod utils;
+
+pub struct Pose {
+    orientation: Quaternion<f64>,
+    position: Vector3<f64>,
+}
+
+pub struct Transform {
+    pub position_diff: Vector3<f64>,
+    pub orientation_diff: Quaternion<f64>,
+}
 
 pub fn timestamp_to_seconds(time: &SystemTime) -> f64 {
     time.duration_since(SystemTime::UNIX_EPOCH)
@@ -69,14 +81,16 @@ mod test {
                             .await
                             .unwrap();
 
-                        match estimator.test_slove_displacement(&tracked) {
-                            Ok(d) => {
-                                let o = UnitQuaternion::from_quaternion(d.orientation_diff)
+                        match estimator.test_slove_transform(&tracked) {
+                            Ok(transform) => {
+                                let o = UnitQuaternion::from_quaternion(transform.orientation_diff)
                                     .euler_angles();
                                 println!("R: {} {} {}", o.0, o.1, o.2);
                                 println!(
                                     "t: {} {} {}",
-                                    d.position_diff[0], d.position_diff[1], d.position_diff[2]
+                                    transform.position_diff[0],
+                                    transform.position_diff[1],
+                                    transform.position_diff[2]
                                 );
                             }
                             Err(_) => println!("Slove failed."),

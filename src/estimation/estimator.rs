@@ -12,7 +12,7 @@ impl Estimator {
         Self { camera_matrix }
     }
 
-    pub fn test_slove_displacement(&self, tracked: &track::Tracked) -> Result<Displacement> {
+    pub fn test_slove_transform(&self, tracked: &track::Tracked) -> Result<Transform> {
         let mut points_0 = vec![];
         let mut points_1 = vec![];
         for i in 0..tracked.points_count() {
@@ -24,6 +24,6 @@ impl Estimator {
             }
         }
 
-        slove_displacement(&self.camera_matrix, &points_0, &points_1)
+        slove_transform(&self.camera_matrix, &points_0, &points_1)
     }
 }
