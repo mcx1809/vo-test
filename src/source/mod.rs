@@ -20,6 +20,7 @@ pub struct Source {
 
 pub struct SourceFrame {
     timestamp: SystemTime,
+    real_rnt_since_prev: Option<RnT>,
     linear_acceleration: Vector3<f64>,
     linear_acceleration_cov: Matrix3<f64>,
     angular_velocity: Vector3<f64>,

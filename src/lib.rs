@@ -40,7 +40,7 @@ mod test {
 
     #[async_std::test]
     async fn test() {
-        let dir = Path::new("data/00");
+        let dir = Path::new("data/dataset/kitti/sequences/00");
         let mut times_reader = utils::TimesReader::open(dir.join("times.txt"))
             .await
             .unwrap();
