@@ -12,7 +12,7 @@ impl Estimator {
         Self { camera_matrix }
     }
 
-    pub fn test_slove_transform(&self, tracked: &track::Tracked) -> Result<Transform> {
+    pub fn test_slove_transform(&self, tracked: &track::Tracked) -> Result<RnT> {
         let mut points_0 = vec![];
         let mut points_1 = vec![];
         for i in 0..tracked.points_count() {

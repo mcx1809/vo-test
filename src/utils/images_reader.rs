@@ -30,8 +30,10 @@ impl ImagesReader {
                 let mut buf = vec![];
                 match file.read_to_end(&mut buf).await {
                     Ok(_) => {
-                        match imdecode(&Vector::<u8>::from_iter(buf.into_iter()), IMREAD_GRAYSCALE)
-                        {
+                        match imdecode(
+                            &opencv::core::Vector::<u8>::from_iter(buf.into_iter()),
+                            IMREAD_GRAYSCALE,
+                        ) {
                             Ok(img) => {
                                 self.current_index += 1;
                                 Ok(img)

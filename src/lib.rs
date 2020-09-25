@@ -15,7 +15,7 @@ pub struct Pose {
     position: Vector3<f64>,
 }
 
-pub struct Transform {
+pub struct RnT {
     pub position_diff: Vector3<f64>,
     pub orientation_diff: Quaternion<f64>,
 }

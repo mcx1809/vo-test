@@ -17,8 +17,7 @@ rand = '^0.7'
 rand_distr = '^0.2'
 
 [dependencies.nalgebra]
-default-features = false
-version = '^0.21'
+version = '^0.22'
 
 [dependencies.async-std]
 features = ['attributes', 'unstable']

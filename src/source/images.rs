@@ -100,8 +100,11 @@ impl ImagesReader {
     }
 
     async fn decode_file(buf: Vec<u8>) -> Result<Mat> {
-        // TODO: 额外的拷贝
-        if let Ok(image) = imdecode(&Vector::<u8>::from_iter(buf.into_iter()), IMREAD_GRAYSCALE) {
+        // TODO: 额外的拷贝:
+        if let Ok(image) = imdecode(
+            &opencv::core::Vector::<u8>::from_iter(buf.into_iter()),
+            IMREAD_GRAYSCALE,
+        ) {
             Ok(image)
         } else {
             Err(Error::from(ErrorKind::InvalidData))
