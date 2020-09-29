@@ -23,6 +23,9 @@ version = '^0.22'
 features = ['attributes', 'unstable']
 version = '^1.6'
 
+[dependencies.async-trait]
+version = '^0.1'
+
 [dependencies.opencv]
 default-features = false
 features = ['opencv-4', 'contrib', 'buildtime-bindgen']

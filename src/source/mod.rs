@@ -1,4 +1,3 @@
-use std::path::*;
 use std::time::SystemTime;
 
 use nalgebra::*;
@@ -6,15 +5,12 @@ use opencv::core::*;
 
 use crate::*;
 
-mod images;
-mod imu;
+//mod imu;
 
-use images::*;
-use imu::*;
+//use imu::*;
 
-pub struct Source {
-    imu_data: ImuData,
-    images_reader: ImagesReader,
+pub struct Source<Reader: utils::DatasetReader> {
+    dataset_reader: Reader,
     camera_param: Matrix3x4<f64>,
 }
 
@@ -25,14 +21,17 @@ pub struct SourceFrame {
     linear_acceleration_cov: Matrix3<f64>,
     angular_velocity: Vector3<f64>,
     angular_velocity_cov: Matrix3<f64>,
-    image: Mat,
     camera_param: Matrix3x4<f64>,
+    image: Mat,
 }
 
-impl Source {
-    pub async fn new<P: AsRef<Path>>(dir: P) -> Result<Self> {
-        match ImuData::load(dir.as_ref(), &Vector3::zeros(), &Vector3::zeros()).await {
-            Ok(imu_data) => match ImagesReader::open(dir.as_ref()).await {
+impl<Reader: utils::DatasetReader> Source<Reader> {
+    pub async fn new(reader: Reader) -> Result<Self> {
+        let mut reader = reader;
+        let cam_param = reader.read_camera_param().await?;
+
+        /*match ImuData::load(dir.as_ref(), &Vector3::zeros(), &Vector3::zeros()).await {
+            Ok(imu_data) => {
                 Ok(images_reader) => {
                     match utils::read_camera_param(dir.as_ref().join("asd")).await {
                         Ok(camera_params) => match camera_params.get(0) {
@@ -45,17 +44,20 @@ impl Source {
                         },
                         Err(err) => Err(err),
                     }
+                    panic!("")
                 }
                 Err(err) => Err(err),
-            },
+                panic!("");
+            }
             Err(err) => Err(err),
-        }
+        }*/
+        panic!("");
     }
 
     pub async fn read_next(&mut self) -> Result<SourceFrame> {
         //
-        self.imu_data
-            .get_transform(&seconds_to_timestamp(0.0), &seconds_to_timestamp(0.0));
+        //self.imu_data
+        //    .get_transform(&seconds_to_timestamp(0.0), &seconds_to_timestamp(0.0));
 
         panic!("");
     }

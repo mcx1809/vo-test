@@ -4,18 +4,20 @@ use std::time::SystemTime;
 use async_std::fs::File;
 use async_std::io::BufReader;
 use async_std::prelude::*;
+use async_trait::async_trait;
 use opencv::core::*;
 use opencv::imgcodecs::*;
 
+use super::ImagesReader;
 use crate::*;
 
-pub struct ImagesReader {
+pub struct TumImagesReader {
     images_dir: PathBuf,
     index_file_reader: BufReader<File>,
     read_ahead: Option<Result<(SystemTime, Vec<u8>)>>,
 }
 
-impl ImagesReader {
+impl TumImagesReader {
     pub async fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         match File::open(path.as_ref().join("rgb.txt")).await {
             Ok(file) => {
@@ -28,25 +30,6 @@ impl ImagesReader {
                 s.read_ahead = Some(s.read_next_file().await);
 
                 Ok(s)
-            }
-            Err(err) => Err(err),
-        }
-    }
-
-    pub async fn read_next(&mut self) -> Result<(SystemTime, Mat)> {
-        match self.read_ahead.take().unwrap() {
-            Ok((time, image_buf)) => {
-                let (ra, ri) = self
-                    .read_next_file()
-                    .join(Self::decode_file(image_buf))
-                    .await;
-
-                self.read_ahead = Some(ra);
-                if let Ok(image) = ri {
-                    Ok((time, image))
-                } else {
-                    Err(Error::from(ErrorKind::InvalidData))
-                }
             }
             Err(err) => Err(err),
         }
@@ -100,7 +83,7 @@ impl ImagesReader {
     }
 
     async fn decode_file(buf: Vec<u8>) -> Result<Mat> {
-        // TODO: 额外的拷贝:
+        // TODO: 额外的拷贝
         if let Ok(image) = imdecode(
             &opencv::core::Vector::<u8>::from_iter(buf.into_iter()),
             IMREAD_GRAYSCALE,
@@ -108,6 +91,28 @@ impl ImagesReader {
             Ok(image)
         } else {
             Err(Error::from(ErrorKind::InvalidData))
+        }
+    }
+}
+
+#[async_trait]
+impl ImagesReader for TumImagesReader {
+    async fn read_next(&mut self) -> Result<(SystemTime, Mat)> {
+        match self.read_ahead.take().unwrap() {
+            Ok((time, image_buf)) => {
+                let (ra, ri) = self
+                    .read_next_file()
+                    .join(Self::decode_file(image_buf))
+                    .await;
+
+                self.read_ahead = Some(ra);
+                if let Ok(image) = ri {
+                    Ok((time, image))
+                } else {
+                    Err(Error::from(ErrorKind::InvalidData))
+                }
+            }
+            Err(err) => Err(err),
         }
     }
 }
@@ -120,7 +125,7 @@ mod test {
 
     #[async_std::test]
     async fn test() {
-        let mut reader = ImagesReader::open("data/rgbd_dataset_freiburg1_xyz")
+        let mut reader = TumImagesReader::open("data/rgbd_dataset_freiburg1_xyz")
             .await
             .unwrap();
 

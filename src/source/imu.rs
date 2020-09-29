@@ -12,6 +12,84 @@ use rand_distr::StandardNormal;
 
 use crate::*;
 
+pub struct ImuDataSource {
+    o_std_div: Vector3<f64>,
+    p_std_div: Vector3<f64>,
+    poses: BTreeMap<SystemTime, (Quaternion<f64>, Vector3<f64>)>,
+    velocities: BTreeMap<SystemTime, (Vector3<f64>, Vector3<f64>)>,
+}
+
+impl ImuDataSource {
+    pub fn new(o_std_div: Vector3<f64>, p_std_div: Vector3<f64>) -> Self {
+        Self {
+            o_std_div,
+            p_std_div,
+            poses: BTreeMap::new(),
+            velocities: BTreeMap::new(),
+        }
+    }
+
+    pub fn input_real_pose(&mut self, time: &SystemTime, pose: &Pose) {
+        let (roll, pitch, yaw) = UnitQuaternion::from_quaternion(pose.orientation).euler_angles();
+        let orientation = UnitQuaternion::from_euler_angles(
+            roll + thread_rng().sample::<f64, _>(StandardNormal) * self.o_std_div[0],
+            pitch + thread_rng().sample::<f64, _>(StandardNormal) * self.o_std_div[1],
+            yaw + thread_rng().sample::<f64, _>(StandardNormal) * self.o_std_div[2],
+        )
+        .quaternion()
+        .clone();
+
+        let position = pose.position
+            + Vector3::new(
+                self.p_std_div.x * thread_rng().sample::<f64, _>(StandardNormal),
+                self.p_std_div.y * thread_rng().sample::<f64, _>(StandardNormal),
+                self.p_std_div.z * thread_rng().sample::<f64, _>(StandardNormal),
+            );
+
+        self.poses.insert(*time, (orientation, position));
+    }
+
+    pub fn get_transform(
+        &self,
+        time0: &SystemTime,
+        time1: &SystemTime,
+    ) -> Option<(Vector3<f64>, UnitQuaternion<f64>)> {
+        let get_interpolated = |time: &SystemTime| {
+            self.positions
+                .range((Unbounded, Included(time)))
+                .into_iter()
+                .next_back()
+                .and_then(|p0| {
+                    self.positions
+                        .range((Included(time), Unbounded))
+                        .next()
+                        .map(|p1| {
+                            let d1 = p1.0.duration_since(*p0.0).unwrap().as_secs_f64();
+                            const EPSILON: f64 = 1e-6;
+                            if d1.abs() >= EPSILON {
+                                let d0 = time.duration_since(*p0.0).unwrap().as_secs_f64();
+
+                                let f1 = d0 / d1;
+                                let f0 = 1.0 - f1;
+
+                                ((p0.1).0 * f0 + (p1.1).0 * f1, (p0.1).1.lerp(&(p1.1).1, f1))
+                            } else {
+                                *p0.1
+                            }
+                        })
+                })
+        };
+
+        get_interpolated(time0).and_then(|p0| {
+            get_interpolated(time1).and_then(|p1| {
+                p0.1.try_inverse().and_then(|p01i| {
+                    Some((p1.0 - p0.0, UnitQuaternion::from_quaternion(p1.1 * p01i)))
+                })
+            })
+        })
+    }
+}
+
 pub struct ImuData {
     positions: BTreeMap<SystemTime, (Vector3<f64>, Quaternion<f64>)>,
 }
