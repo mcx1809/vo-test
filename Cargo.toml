@@ -13,8 +13,10 @@ name = 'vo'
 path = 'src/lib.rs'
 
 [dependencies]
+async-trait = '^0.1'
 rand = '^0.7'
 rand_distr = '^0.2'
+chrono = '^0.4'
 
 [dependencies.nalgebra]
 version = '^0.22'
@@ -22,9 +24,6 @@ version = '^0.22'
 [dependencies.async-std]
 features = ['attributes', 'unstable']
 version = '^1.6'
-
-[dependencies.async-trait]
-version = '^0.1'
 
 [dependencies.opencv]
 default-features = false
