@@ -4,6 +4,11 @@ pub struct Extractor {
     orb: Ptr<dyn ORB>,
 }
 
+pub struct Features {
+    pub keypoints: Vector<KeyPoint>,
+    pub descriptors: Mat,
+}
+
 impl Extractor {
     pub fn new() -> Self {
         Self {
@@ -29,11 +34,6 @@ impl Extractor {
             descriptors,
         }
     }
-}
-
-pub struct Features {
-    pub keypoints: Vector<KeyPoint>,
-    pub descriptors: Mat,
 }
 
 #[cfg(test)]

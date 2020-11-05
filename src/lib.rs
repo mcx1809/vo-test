@@ -15,14 +15,14 @@ pub struct RnT {
     pub orientation_diff: Quaternion<f64>,
 }
 
-struct Imu {
+pub struct Imu {
     acceleration: Vector3<f64>,
     acceleration_stdev: Vector3<f64>,
     angular_velocity: Vector3<f64>,
     angular_velocity_stdev: Vector3<f64>,
 }
 
-struct Pose {
+pub struct Pose {
     orientation: Quaternion<f64>,
     position: Vector3<f64>,
 }
@@ -46,7 +46,7 @@ mod test {
 
     #[async_std::test]
     async fn test() {
-        let mut dataset_reader =
+        /*let mut dataset_reader =
             utils::KittiDatasetReader::open("data/dataset/kitti/sequences/00", 0)
                 .await
                 .unwrap();
@@ -98,6 +98,6 @@ mod test {
                     break 'a;
                 }
             }
-        }
+        }*/
     }
 }
